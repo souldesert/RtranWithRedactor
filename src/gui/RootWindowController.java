@@ -13,4 +13,8 @@ public class RootWindowController {
     @FXML
     private void initialize() {
     }
+    @FXML
+    private void handleClose() {
+        System.exit(0);
+    }
 }
