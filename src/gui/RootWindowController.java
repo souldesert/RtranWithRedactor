@@ -1,18 +1,11 @@
-package gui.redactor;
+package gui;
 
-import gui.MainApp;
 import javafx.fxml.FXML;
 
 /**
  * Created by svkreml on 23.10.2016.
  */
-public class RedactorController {
-
-    @FXML
-    void button(){
-
-    }
-
+public class RootWindowController {
     private MainApp mainApp;
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
