@@ -1,6 +1,7 @@
 package gui;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 
 /**
@@ -36,6 +37,10 @@ public class RootWindowController {
     }
     @FXML
     private void about() {
-
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("О программе");
+        alert.setHeaderText("About");
+        alert.setContentText("текста пример");
+        alert.showAndWait();
     }
 }
