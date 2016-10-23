@@ -1,11 +1,28 @@
 package gui;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.TableColumn;
 
 /**
  * Created by svkreml on 23.10.2016.
  */
 public class RootWindowController {
+    @FXML
+    private TableColumn<String, String> Метка;
+    @FXML
+    private TableColumn<String, String> Условие;
+    @FXML
+    private TableColumn<String, String> ЛинейныеОператоры;
+    @FXML
+    private TableColumn<String, String> МеткаПерехода;
+    @FXML
+    private TableColumn<String, String> Комментарии;
+
+
+
+
+
+
     private MainApp mainApp;
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
@@ -14,7 +31,11 @@ public class RootWindowController {
     private void initialize() {
     }
     @FXML
-    private void handleClose() {
+    private void закрытьОкно() {
         System.exit(0);
+    }
+    @FXML
+    private void about() {
+
     }
 }

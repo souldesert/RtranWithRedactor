@@ -30,7 +30,7 @@
                <menus>
                   <Menu mnemonicParsing="false" text="File">
                      <items>
-                        <MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
+                        <MenuItem mnemonicParsing="false" onAction="#закрытьОкно" text="Close" />
                      </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Edit">
@@ -65,11 +65,11 @@
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                      </columnResizePolicy>
                      <columns>
-                        <TableColumn prefWidth="75.0" sortable="false" text="Метка" />
-                        <TableColumn prefWidth="75.0" sortable="false" text="Условие" />
-                        <TableColumn prefWidth="75.0" sortable="false" text="Линейные операторы" />
-                        <TableColumn prefWidth="75.0" sortable="false" text="Метка перехода" />
-                        <TableColumn prefWidth="75.0" sortable="false" text="Комментарии" />
+                        <TableColumn fx:id="Метка" prefWidth="75.0" sortable="false" text="Метка" />
+                        <TableColumn fx:id="Условие" prefWidth="75.0" sortable="false" text="Условие" />
+                        <TableColumn fx:id="ЛинейныеОператоры" prefWidth="75.0" sortable="false" text="Линейные операторы" />
+                        <TableColumn fx:id="МеткаПерехода" prefWidth="75.0" sortable="false" text="Метка перехода" />
+                        <TableColumn fx:id="Комментарии" prefWidth="75.0" sortable="false" text="Комментарии" />
                      </columns>
                   </TableView>
                </items>
