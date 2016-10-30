@@ -2,7 +2,9 @@ package gui;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
+import javafx.scene.layout.AnchorPane;
 
 /**
  * Created by svkreml on 23.10.2016.
@@ -18,23 +20,28 @@ public class RootWindowController {
     private TableColumn<String, String> МеткаПерехода;
     @FXML
     private TableColumn<String, String> Комментарии;
-
-
-
-
-
-
+    @FXML
+    private Tab redactorTab;
+    @FXML
+    private AnchorPane redactorTabAnchorPane;
     private MainApp mainApp;
+
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
+        this.mainApp.redactorTab = redactorTab;
+        this.mainApp.redactorTabAnchorPane = redactorTabAnchorPane;
     }
+
     @FXML
     private void initialize() {
+
     }
+
     @FXML
     private void закрытьОкно() {
         System.exit(0);
     }
+
     @FXML
     private void about() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
