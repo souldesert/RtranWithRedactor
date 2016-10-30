@@ -23,13 +23,11 @@ public class RootWindowController {
     @FXML
     private Tab redactorTab;
     @FXML
-    private AnchorPane redactorTabAnchorPane;
     private MainApp mainApp;
 
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
         this.mainApp.redactorTab = redactorTab;
-        this.mainApp.redactorTabAnchorPane = redactorTabAnchorPane;
     }
 
     @FXML

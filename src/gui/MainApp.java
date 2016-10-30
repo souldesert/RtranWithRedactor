@@ -14,7 +14,6 @@ import java.io.IOException;
 
 public class MainApp extends Application {
     public Tab redactorTab;
-    public AnchorPane redactorTabAnchorPane;
 
 
     private Stage primaryStage;
