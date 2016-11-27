@@ -7,6 +7,11 @@ import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import project.Project;
@@ -40,6 +45,18 @@ public class MainApp extends Application {
         //initNewProjectWindow();
     }
 
+    public TextFlow getErrorConsole() {
+        return errorConsole;
+    }
+
+    TextFlow errorConsole;
+    public void printError(String text){
+        Text text2 = new Text(text);
+        text2.setFill(Color.BLUE);
+        text2.setFont(Font.font("Helvetica", FontWeight.BOLD, 10));
+        errorConsole.getChildren().add(text2);
+    }
+
     public void initRootWindow() {
         try {
             // Загружаем корневой макет из fxml файла.
@@ -55,6 +72,7 @@ public class MainApp extends Application {
             controller.setMainApp(this);
             treeViewPane= controller.getTreeViewPane();
             primaryStage.show();
+            this.errorConsole=controller.getErrorConsole();
         } catch (IOException e) {
             e.printStackTrace();
         }

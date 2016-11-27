@@ -41,7 +41,9 @@ public class TreeController {
         return copy;
     }
 
-    private static void saveFolders(Path folder, TreeItem<AnyInfo> item) throws IOException {
+    private void saveFolders(Path folder, TreeItem<AnyInfo> item) throws IOException {
+        /*if(projectDirectory==null)
+            return;
         AnyInfo value = item.getValue();
         Path file = folder.resolve(value.getName());
         if (value instanceof FolderInfo) {
@@ -52,7 +54,7 @@ public class TreeController {
         } else {
             Files.createFile(file);
             //todo заполнить файл содержимым
-        }
+        }*/
     }
 
     @FXML

@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -33,6 +34,13 @@ public class RootWindowController {
     @FXML
     private AnchorPane treeViewPane;
 
+    public TextFlow getErrorConsole() {
+        return errorConsole;
+    }
+
+
+    @FXML
+    private TextFlow errorConsole;
 
     @FXML
     private void initialize() {
