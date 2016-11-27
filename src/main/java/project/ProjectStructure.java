@@ -14,6 +14,9 @@ public class ProjectStructure {
     @JacksonXmlProperty
     ArrayList<ProjFile> file= new ArrayList<>();
 
+    public ProjectStructure() {
+    }
+
     public ProjectStructure(String root) {
         this.root = root;
     }

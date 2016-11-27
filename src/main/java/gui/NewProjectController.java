@@ -1,7 +1,5 @@
 package gui;
 
-import javafx.stage.FileChooser;
-import project.Project;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -45,7 +43,7 @@ public class NewProjectController {
     }
 
     @FXML
-    public void handleChooseDirectory() {
+    public void handleChooseDirectory() throws IOException {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Создание проекта");
         File defaultDirectory = new File("c:/");
@@ -53,9 +51,10 @@ public class NewProjectController {
         selectedDirectory = chooser.showDialog(newProjectStage);
         directoryName.setText(selectedDirectory.toString());
         errorLabel.setText("");
+
     }
     @FXML
-    public void handleCreateProject() {
+    public void handleCreateProject() throws IOException {
         projectDirectory=new File(selectedDirectory, projectName.getText());
         if(projectDirectory.isDirectory()) {
             errorLabel.setText("Папка уже существует");
@@ -67,6 +66,8 @@ public class NewProjectController {
         }
         else {
             createProjectFiles(projectDirectory);
+            TreeController treeController = mainApp.getTreeController();
+            treeController.openProject(projectDirectory.toPath());
             newProjectStage.close();
         }
     }

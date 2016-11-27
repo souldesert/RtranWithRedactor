@@ -15,6 +15,9 @@ public class ProjectTreeRoot {
     @JacksonXmlProperty(isAttribute = true)
     String project_name;
 
+    public ProjectTreeRoot() {
+    }
+
     public ProjectTreeRoot(String type, String version, String project_name, ProjectStructure project_structure) {
         this.type = type;
         this.version = version;

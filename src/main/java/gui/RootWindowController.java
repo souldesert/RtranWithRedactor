@@ -2,6 +2,8 @@ package gui;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -24,6 +26,14 @@ public class RootWindowController {
         this.rootWindow = rootWindow;
     }
 
+    public AnchorPane getTreeViewPane() {
+        return treeViewPane;
+    }
+
+    @FXML
+    private AnchorPane treeViewPane;
+
+
     @FXML
     private void initialize() {
 
@@ -40,7 +50,7 @@ public class RootWindowController {
     }
 
     @FXML
-    private void openProject() {
+    private void openProject() throws IOException {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Открытие проекта");
         File defaultDirectory = new File("c:/");
@@ -48,6 +58,8 @@ public class RootWindowController {
         chooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("R-tran", "*.rtran"));
         File projectDirectory = chooser.showOpenDialog(rootWindow);
+        TreeController treeController = mainApp.getTreeController();
+        treeController.openProject(projectDirectory.toPath());
         try {
             mainApp.getProject().open(projectDirectory);
         } catch (IOException e) {

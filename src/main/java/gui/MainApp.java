@@ -3,6 +3,8 @@ package gui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.TreeView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
@@ -34,7 +36,7 @@ public class MainApp extends Application {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("R_tran");
         initRootWindow();
-
+        initTree();
         //initNewProjectWindow();
     }
 
@@ -51,6 +53,7 @@ public class MainApp extends Application {
             RootWindowController controller = loader.getController();
             controller.setRootWindow(primaryStage);
             controller.setMainApp(this);
+            treeViewPane= controller.getTreeViewPane();
             primaryStage.show();
         } catch (IOException e) {
             e.printStackTrace();
@@ -75,6 +78,30 @@ public class MainApp extends Application {
             controller.setMainApp(this);
             newProjectStage.showAndWait();
             primaryStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    AnchorPane treeViewPane;
+
+    public TreeController getTreeController() {
+        return treeController;
+    }
+
+    TreeController treeController;
+    public void initTree() {
+        try {
+            // Загружаем сведения об адресатах.
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getResource("Tree.fxml"));
+            AnchorPane treeView = loader.load();
+            // Даём контроллеру доступ к главному приложению.
+            treeController = loader.getController();
+
+            treeViewPane.getChildren().add(treeView);
+           // treeView.fit
+            //controller.setMainApp(this);
         } catch (IOException e) {
             e.printStackTrace();
         }

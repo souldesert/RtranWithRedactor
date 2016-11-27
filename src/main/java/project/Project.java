@@ -26,7 +26,7 @@ public class Project {
         JacksonXmlModule module = new JacksonXmlModule();
         module.setDefaultUseWrapper(false);
         XmlMapper xmlMapper = new XmlMapper(module);
-        return xmlMapper.readValue(new File("project.rtran"), ProjectTreeRoot.class);
+        return xmlMapper.readValue(directory, ProjectTreeRoot.class);
     }
 }
  /*   public void Project() throws IOException {

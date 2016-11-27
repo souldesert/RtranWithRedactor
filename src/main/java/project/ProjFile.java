@@ -17,6 +17,9 @@ public class ProjFile{
     @JacksonXmlProperty(localName = "folder")
     ArrayList<ProjFile> folder= new ArrayList<>();
 
+    public ProjFile() {
+    }
+
     @Override
     public String toString() {
         if(file==null&&folder==null)
