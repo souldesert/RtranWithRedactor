@@ -3,8 +3,8 @@ package gui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -28,6 +28,11 @@ public class MainApp extends Application {
         this.testTextArea = testTextArea;
     }
 
+    public javafx.scene.control.TabPane getRedactorTabs() {
+        return redactorTabs;
+    }
+
+    TabPane redactorTabs;
     TextArea testTextArea;
     Project project=new Project();
     private Stage primaryStage;
@@ -82,6 +87,7 @@ public class MainApp extends Application {
             treeViewPane= controller.getTreeViewPane();
             primaryStage.show();
             testTextArea=controller.getTestTextArea();
+            redactorTabs =controller.getRedactorTabs();
             this.errorConsole=controller.getErrorConsole();
         } catch (IOException e) {
             e.printStackTrace();
@@ -120,7 +126,7 @@ public class MainApp extends Application {
     TreeController treeController;
     public void initTree() {
         try {
-            
+
             // Загружаем сведения об адресатах.
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getResource("Tree.fxml"));

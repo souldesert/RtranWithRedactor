@@ -2,10 +2,7 @@ package gui;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTreeCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,24 +18,33 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TreeController {
+    private final Image folderImage = new Image("/tree/folder-icon.png");
+    private final Image fileImage = new Image("/tree/File-512.png");
     MainApp mainApp;
+    @FXML
+    TreeView treeView;
+    Path projectDirectory;
+    // new!!!!!!!!
+    TreeItem oldTreeItem;
+    private TreeItem<AnyInfo> dragging = null;
+
+    static String readFile(Path path, Charset encoding)
+            throws IOException {
+        byte[] encoded = Files.readAllBytes(path);
+        return new String(encoded, encoding);
+    }
 
     public void setMainApp(MainApp mainApp) {
         this.mainApp = mainApp;
     }
 
-    private final Image folderImage = new Image("/tree/folder-icon.png");
-    private final Image fileImage = new Image("/tree/File-512.png");
-    @FXML
-    TreeView treeView;
-    Path projectDirectory;
-    private TreeItem<AnyInfo> dragging = null;
-
     private TreeItem<AnyInfo> cloneTree(TreeItem<AnyInfo> item) {
         TreeItem<AnyInfo> copy;
-        if(item.getValue() instanceof FolderInfo)
+        if (item.getValue() instanceof FolderInfo)
             copy = new TreeItem<AnyInfo>(item.getValue(), new ImageView(folderImage));
         else
             copy = new TreeItem<AnyInfo>(item.getValue(), new ImageView(fileImage));
@@ -65,6 +71,7 @@ public class TreeController {
     }
 
     void openProject(Path path) throws IOException {
+        redactorTabs=mainApp.getRedactorTabs();
         projectDirectory = path;
         TreeItem<AnyInfo> rootItem = loadFolders(path.getParent());
         treeView.setRoot(rootItem);
@@ -186,26 +193,44 @@ public class TreeController {
             return new TreeItem<>(new FileInfo(file.getFileName().toString(), file.toAbsolutePath()), new ImageView(fileImage));
         }
     }
-    // new!!!!!!!!
-    TreeItem oldTreeItem;
+TabPane redactorTabs;
+    Map<FileInfo,Tab> tabs = new HashMap<>();
     private void updateSelectedItem(Object newValue) {
-            TreeItem newTreeItem =(TreeItem) newValue;
-        if(!newTreeItem.equals(oldTreeItem)&&(newTreeItem.getValue() instanceof FileInfo)) {
-            oldTreeItem =newTreeItem;
+        TreeItem newTreeItem = (TreeItem) newValue;
+        if (!newTreeItem.equals(oldTreeItem) && (newTreeItem.getValue() instanceof FileInfo)) {
+            oldTreeItem = newTreeItem;
             System.out.println(((FileInfo) newTreeItem.getValue()).getPath());
-            try {
-                mainApp.getTestTextArea().setText(readFile(((FileInfo) newTreeItem.getValue()).getPath(),Charset.defaultCharset()));
-            } catch (IOException e) {
-                e.printStackTrace();
+            FileInfo file = (FileInfo) newTreeItem.getValue();
+            SingleSelectionModel<Tab> selectionModel = redactorTabs.getSelectionModel();
+            //mainApp.getTestTextArea().setText(readFile(((FileInfo) newTreeItem.getValue()).getPath(), Charset.defaultCharset()));
+            Tab tab = new Tab();
+            if(!tabs.containsKey(file)) {
+                tabs.put(file, tab);
+                TextArea textArea = new TextArea();
+                try {
+                    textArea.setText(readFile(((FileInfo) newTreeItem.getValue()).getPath(), Charset.defaultCharset()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                tab.setText(file.getName());
+                tab.setContent(textArea);
+                redactorTabs.getTabs().add(tab);
+            }else{
+                selectionModel.select(tabs.get(file));
+            }
+            if (file.getName().equals("project.rtran")) {
+                //todo что-то сделать?
+            } else if (file.getName().equals("program.rtran")) {
+                //todo запустить редактор кода
+            } else {
+                //todo редактор текста
+                //todo сделать сохранение изменений.
+                //todo передавать путь, а не текст
+                //mainApp.getTestTextArea().setText(readFile(((FileInfo) newTreeItem.getValue()).getPath(), Charset.defaultCharset()));
             }
         }
     }
-    static String readFile(Path path, Charset encoding)
-            throws IOException
-    {
-        byte[] encoded = Files.readAllBytes(path);
-        return new String(encoded, encoding);
-    }
+
     private void insert(TreeItem<AnyInfo> parent, TreeItem<AnyInfo> child) {
         ObservableList<TreeItem<AnyInfo>> children = parent.getChildren();
         children.add(child);
@@ -218,9 +243,9 @@ public class TreeController {
             AnyInfo v1 = o1.getValue();
             AnyInfo v2 = o2.getValue();
             if (v1 instanceof FolderInfo && v2 instanceof FileInfo)
-                return -1;
-            if (v1 instanceof FileInfo && v2 instanceof FolderInfo)
                 return 1;
+            if (v1 instanceof FileInfo && v2 instanceof FolderInfo)
+                return -1;
             return v1.getName().compareToIgnoreCase(v2.getName());
         });
     }

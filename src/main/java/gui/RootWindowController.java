@@ -2,6 +2,7 @@ package gui;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -9,6 +10,7 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.swing.text.TabSet;
 import java.io.File;
 import java.io.IOException;
 
@@ -55,6 +57,12 @@ public class RootWindowController {
     @FXML
     TextArea testTextArea;
 
+    public TabPane getRedactorTabs() {
+        return redactorTabs;
+    }
+
+    @FXML
+    TabPane redactorTabs;
     @FXML
     private void closeProgram() {
         System.exit(0);
