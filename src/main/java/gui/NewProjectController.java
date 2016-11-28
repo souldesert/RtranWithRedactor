@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 /**
  * Created by svkreml on 20.11.2016.
@@ -67,7 +68,7 @@ public class NewProjectController {
         else {
             createProjectFiles(projectDirectory);
             TreeController treeController = mainApp.getTreeController();
-            treeController.openProject(projectDirectory.toPath());
+            treeController.openProject(new File(projectDirectory, "prject.rtran").toPath());
             newProjectStage.close();
         }
     }
@@ -76,6 +77,14 @@ public class NewProjectController {
     public void createProjectFiles(File directory){
         try {
             mainApp.getProject().create(directory);
+            File input = new File(directory,"input");
+            input.mkdir();
+            File output = new File(directory,"output");
+            output.mkdir();
+            File test = new File(directory,"test");
+            test.mkdir();
+            File program = new File(directory,"program.rtran");
+            program.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }

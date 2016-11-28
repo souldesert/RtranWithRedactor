@@ -2,6 +2,7 @@ package gui;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.TextFlow;
@@ -47,6 +48,13 @@ public class RootWindowController {
 
     }
 
+    public TextArea getTestTextArea() {
+        return testTextArea;
+    }
+
+    @FXML
+    TextArea testTextArea;
+
     @FXML
     private void closeProgram() {
         System.exit(0);
@@ -64,7 +72,7 @@ public class RootWindowController {
         File defaultDirectory = new File("c:/");
         chooser.setInitialDirectory(defaultDirectory);
         chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("R-tran", "*.rtran"));
+                new FileChooser.ExtensionFilter("R-tran", "project.rtran"));
         File projectDirectory = chooser.showOpenDialog(rootWindow);
         TreeController treeController = mainApp.getTreeController();
         treeController.openProject(projectDirectory.toPath());

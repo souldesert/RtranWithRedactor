@@ -3,6 +3,7 @@ package gui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -19,7 +20,15 @@ import project.Project;
 import java.io.IOException;
 
 public class MainApp extends Application {
+    public TextArea getTestTextArea() {
+        return testTextArea;
+    }
 
+    public void setTestTextArea(TextArea testTextArea) {
+        this.testTextArea = testTextArea;
+    }
+
+    TextArea testTextArea;
     Project project=new Project();
     private Stage primaryStage;
     private BorderPane RootWindow;
@@ -72,6 +81,7 @@ public class MainApp extends Application {
             controller.setMainApp(this);
             treeViewPane= controller.getTreeViewPane();
             primaryStage.show();
+            testTextArea=controller.getTestTextArea();
             this.errorConsole=controller.getErrorConsole();
         } catch (IOException e) {
             e.printStackTrace();
@@ -110,16 +120,17 @@ public class MainApp extends Application {
     TreeController treeController;
     public void initTree() {
         try {
+            
             // Загружаем сведения об адресатах.
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getResource("Tree.fxml"));
             AnchorPane treeView = loader.load();
             // Даём контроллеру доступ к главному приложению.
             treeController = loader.getController();
-
+            //testTextArea= treeController.getT
             treeViewPane.getChildren().add(treeView);
            // treeView.fit
-            //controller.setMainApp(this);
+            treeController.setMainApp(this);
         } catch (IOException e) {
             e.printStackTrace();
         }

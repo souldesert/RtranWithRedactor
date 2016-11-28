@@ -16,12 +16,19 @@ import tree.FileInfo;
 import tree.FolderInfo;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 
 public class TreeController {
+    MainApp mainApp;
+
+    public void setMainApp(MainApp mainApp) {
+        this.mainApp = mainApp;
+    }
+
     private final Image folderImage = new Image("/tree/folder-icon.png");
     private final Image fileImage = new Image("/tree/File-512.png");
     @FXML
@@ -55,11 +62,6 @@ public class TreeController {
             Files.createFile(file);
             //todo заполнить файл содержимым
         }*/
-    }
-
-    @FXML
-    TreeController getTreeController() {
-        return this;
     }
 
     void openProject(Path path) throws IOException {
@@ -102,6 +104,7 @@ public class TreeController {
                 dragging = treeItem;
                 event.consume();
             });
+            treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> updateSelectedItem(newValue));
             cell.setOnDragOver(event -> event.acceptTransferModes(TransferMode.COPY_OR_MOVE));
             cell.setOnDragDropped(event -> {
                 //if(cell.getClass()==)
@@ -183,7 +186,26 @@ public class TreeController {
             return new TreeItem<>(new FileInfo(file.getFileName().toString(), file.toAbsolutePath()), new ImageView(fileImage));
         }
     }
-
+    // new!!!!!!!!
+    TreeItem oldTreeItem;
+    private void updateSelectedItem(Object newValue) {
+            TreeItem newTreeItem =(TreeItem) newValue;
+        if(!newTreeItem.equals(oldTreeItem)&&(newTreeItem.getValue() instanceof FileInfo)) {
+            oldTreeItem =newTreeItem;
+            System.out.println(((FileInfo) newTreeItem.getValue()).getPath());
+            try {
+                mainApp.getTestTextArea().setText(readFile(((FileInfo) newTreeItem.getValue()).getPath(),Charset.defaultCharset()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    static String readFile(Path path, Charset encoding)
+            throws IOException
+    {
+        byte[] encoded = Files.readAllBytes(path);
+        return new String(encoded, encoding);
+    }
     private void insert(TreeItem<AnyInfo> parent, TreeItem<AnyInfo> child) {
         ObservableList<TreeItem<AnyInfo>> children = parent.getChildren();
         children.add(child);
@@ -258,11 +280,13 @@ public class TreeController {
     @FXML
     void buttonSave() {
         TreeItem<AnyInfo> root = treeView.getRoot();
-        try {
+
+
+        /*try {
             saveFolders(projectDirectory, root);
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     @FXML
