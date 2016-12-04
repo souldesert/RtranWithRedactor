@@ -1,5 +1,7 @@
 package gui;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -17,7 +19,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,12 +31,27 @@ public class TreeController {
     Path projectDirectory;
     // new!!!!!!!!
     TreeItem oldTreeItem;
+    TabPane redactorTabs;
+
+    BiMap<Path, Tab> tabs = HashBiMap.create();
+    boolean magic = false;
+    Map<Tab, TreeItem> tabTree = new HashMap<>();
     private TreeItem<AnyInfo> dragging = null;
 
     static String readFile(Path path, Charset encoding)
             throws IOException {
         byte[] encoded = Files.readAllBytes(path);
         return new String(encoded, encoding);
+    }
+
+    private static boolean containsParent(TreeItem<?> parent, TreeItem<?> child) {
+        TreeItem<?> current = child;
+        while (current != null) {
+            if (current.equals(parent))
+                return true;
+            current = current.getParent();
+        }
+        return false;
     }
 
     public void setMainApp(MainApp mainApp) {
@@ -45,9 +61,9 @@ public class TreeController {
     private TreeItem<AnyInfo> cloneTree(TreeItem<AnyInfo> item) {
         TreeItem<AnyInfo> copy;
         if (item.getValue() instanceof FolderInfo)
-            copy = new TreeItem<AnyInfo>(item.getValue(), new ImageView(folderImage));
+            copy = new TreeItem<>(item.getValue(), new ImageView(folderImage));
         else
-            copy = new TreeItem<AnyInfo>(item.getValue(), new ImageView(fileImage));
+            copy = new TreeItem<>(item.getValue(), new ImageView(fileImage));
         for (TreeItem<AnyInfo> child : item.getChildren()) {
             copy.getChildren().add(cloneTree(child));
         }
@@ -70,8 +86,10 @@ public class TreeController {
         }*/
     }
 
+
+
     void openProject(Path path) throws IOException {
-        redactorTabs=mainApp.getRedactorTabs();
+        redactorTabs = mainApp.getRedactorTabs();
         projectDirectory = path;
         TreeItem<AnyInfo> rootItem = loadFolders(path.getParent());
         treeView.setRoot(rootItem);
@@ -98,6 +116,15 @@ public class TreeController {
                     info.setName(string);
                     sortChildren(item.getParent());
                     cell.getTreeView().getSelectionModel().select(item);
+                    item.getValue().setName(string);
+                    Path newName = Paths.get(item.getValue().getPath().getParent().toString(), string);
+                    try {
+                        Files.move(item.getValue().getPath(), newName);
+                        item.getValue().setPath(newName);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                     return info;
                 }
             };
@@ -119,10 +146,13 @@ public class TreeController {
 //                XmlNode content = (XmlNode) dragboard.getContent(NODE_DATA);
                 MenuItem copyItem = new MenuItem("Копировать");
                 MenuItem moveItem = new MenuItem("Перенести");
-                TreeItem<AnyInfo> dropped = dragging;
-
-
-                if (cell.getTreeItem().getValue() instanceof FolderInfo) {
+                TreeItem<AnyInfo> dropped = dragging; // куда перетаскиваем
+                TreeItem<AnyInfo> dragged = cell.getTreeItem(); // то, что перетаскиваем
+                if (containsParent(dropped, dragged)) {
+                    // todo: показать ошибку
+                    return;
+                }
+                if (dragged.getValue() instanceof FolderInfo) {
                     moveItem.setOnAction(e -> {
 //                    dropped.getParent().getChildren().remove(dropped);
 //                    TreeItem<AnyInfo> copyNode = fromXml(content);
@@ -132,10 +162,9 @@ public class TreeController {
                         //todo проверка на перемещение корня в внутрь себя
 
                         try {
-
-                            Files.move(dropped.getValue().getPath(), Paths.get(cell.getTreeItem().getValue().getPath().toString(),
+                            Files.move(dropped.getValue().getPath(), Paths.get(dragged.getValue().getPath().toString(),
                                     dropped.getValue().getPath().getFileName().toString()));
-                            dropped.getValue().setPath(Paths.get(cell.getTreeItem().getValue().getPath().toString(),
+                            dropped.getValue().setPath(Paths.get(dragged.getValue().getPath().toString(),
                                     dropped.getValue().getPath().getFileName().toString()));
                             dropped.getParent().getChildren().remove(dropped);
                         } catch (IOException e1) {
@@ -193,19 +222,48 @@ public class TreeController {
             return new TreeItem<>(new FileInfo(file.getFileName().toString(), file.toAbsolutePath()), new ImageView(fileImage));
         }
     }
-TabPane redactorTabs;
-    Map<FileInfo,Tab> tabs = new HashMap<>();
+
+    @FXML
+    public void initialize() {
+ /*       Tab tab = new Tab();
+        tab.getOnClosed(), setOnClosed(new EventHandler<Event>(){
+            @Override void handle(Event e){
+                // What you have to do here
+            }
+        });*/
+    }
+
     private void updateSelectedItem(Object newValue) {
+        SingleSelectionModel<Tab> selectionModelTabs = redactorTabs.getSelectionModel();
+        MultipleSelectionModel<TreeItem> selectionModelTree = treeView.getSelectionModel();
         TreeItem newTreeItem = (TreeItem) newValue;
-        if (!newTreeItem.equals(oldTreeItem) && (newTreeItem.getValue() instanceof FileInfo)) {
+        if (newTreeItem == null) return;
+        if (!newTreeItem.equals(oldTreeItem) && newTreeItem.getValue() instanceof FileInfo) {
             oldTreeItem = newTreeItem;
             System.out.println(((FileInfo) newTreeItem.getValue()).getPath());
             FileInfo file = (FileInfo) newTreeItem.getValue();
-            SingleSelectionModel<Tab> selectionModel = redactorTabs.getSelectionModel();
+
             //mainApp.getTestTextArea().setText(readFile(((FileInfo) newTreeItem.getValue()).getPath(), Charset.defaultCharset()));
             Tab tab = new Tab();
-            if(!tabs.containsKey(file)) {
-                tabs.put(file, tab);
+            tab.setOnCloseRequest(arg0 -> {
+                Tab cTab = (Tab) arg0.getTarget();
+                BiMap<Tab, Path> inverse = tabs.inverse();
+                tabs.remove(inverse.get(cTab));
+                tabTree.remove(cTab);
+            });
+            tab.setOnSelectionChanged((arg0) -> {
+       /*         //int row = treeView.getRow();
+                //System.out.println("row = " + row);
+                if (selectionModelTree.getSelectedItem() != tabTree.get(arg0.getTarget())) ;
+                {
+                    selectionModelTree.select(tabTree.get(arg0.getTarget()));
+                }*/
+
+       //todo надо переключать вкладки
+            });
+            if (!tabs.containsKey(file.getPath())) {
+                tabTree.put(tab, newTreeItem);
+                tabs.put(file.getPath(), tab);
                 TextArea textArea = new TextArea();
                 try {
                     textArea.setText(readFile(((FileInfo) newTreeItem.getValue()).getPath(), Charset.defaultCharset()));
@@ -214,9 +272,11 @@ TabPane redactorTabs;
                 }
                 tab.setText(file.getName());
                 tab.setContent(textArea);
+                tab.setClosable(true);
                 redactorTabs.getTabs().add(tab);
-            }else{
-                selectionModel.select(tabs.get(file));
+            } else {
+                selectionModelTabs.select(tabs.get(file.getPath()));
+
             }
             if (file.getName().equals("project.rtran")) {
                 //todo что-то сделать?
@@ -239,7 +299,7 @@ TabPane redactorTabs;
 
     private void sortChildren(TreeItem<AnyInfo> parent) {
         // if(parent.getChildren().size()==1) return;
-        Collections.sort(parent.getChildren(), (o1, o2) -> {
+        (parent.getChildren()).sort((o1, o2) -> {
             AnyInfo v1 = o1.getValue();
             AnyInfo v2 = o2.getValue();
             if (v1 instanceof FolderInfo && v2 instanceof FileInfo)
@@ -251,17 +311,23 @@ TabPane redactorTabs;
     }
 
     private void showMenu(TreeView<AnyInfo> tree, MouseEvent event) {
-        TreeItem<AnyInfo> current = tree.getSelectionModel().getSelectedItem();
         ContextMenu menu;
+        TreeItem<AnyInfo> current = tree.getSelectionModel().getSelectedItem();
+
+
         MenuItem itemEdit = new MenuItem("Изменить");
-        MenuItem itemDelete = new MenuItem("Удалить");
+
         itemEdit.setOnAction(e -> {
             tree.edit(current);
             //todo изменить название
             System.out.println("e = " + e);
             System.out.println("current = " + current.getValue().getPath());
             System.out.println();
+
         });
+        itemEdit.setDisable(current.getValue().getPath().equals(projectDirectory.getParent()));
+        itemEdit.setDisable(current.getParent().getValue().getPath().equals(projectDirectory.getParent()));
+        MenuItem itemDelete = new MenuItem("Удалить");
         itemDelete.setOnAction(e -> {
             try {
                 Files.delete(current.getValue().getPath());
@@ -271,9 +337,11 @@ TabPane redactorTabs;
             current.getParent().getChildren().remove(current);
         });
         itemDelete.setDisable(current.getParent() == null);
+        itemDelete.setDisable(current.getValue().getPath().equals(projectDirectory.getParent()));
+        itemDelete.setDisable(current.getParent().getValue().getPath().equals(projectDirectory.getParent()));
         if (current.getValue() instanceof FolderInfo) {
+
             MenuItem itemAddFolder = new MenuItem("Добавить папку");
-            MenuItem itemAddFile = new MenuItem("Добавить файл");
             itemAddFolder.setOnAction(e -> {
                 TreeItem<AnyInfo> folderItem = new TreeItem<>(new FolderInfo("Новая папка", current.getValue().getPath()), new ImageView(folderImage));
                 insert(current, folderItem);
@@ -285,6 +353,8 @@ TabPane redactorTabs;
                     e1.printStackTrace();
                 }
             });
+
+            MenuItem itemAddFile = new MenuItem("Добавить файл");
             itemAddFile.setOnAction(e -> {
                 try {
                     Files.createFile(Paths.get(current.getValue().getPath().toString(), "Новый файл"));
@@ -300,10 +370,12 @@ TabPane redactorTabs;
             menu = new ContextMenu(itemEdit, itemDelete);
         }
         menu.show(tree.getScene().getWindow(), event.getScreenX(), event.getScreenY());
+
     }
 
     @FXML
     void buttonSave() {
+
         TreeItem<AnyInfo> root = treeView.getRoot();
 
 
@@ -316,6 +388,7 @@ TabPane redactorTabs;
 
     @FXML
     void buttonRefresh() throws IOException {
+        // tabs.clear();
         if (projectDirectory == null) return;
         openProject(projectDirectory);
     }

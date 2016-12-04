@@ -53,7 +53,7 @@
             </MenuBar>
             <ToolBar GridPane.rowIndex="1">
                <items>
-                  <Button mnemonicParsing="false" text="Button" />
+                  <Button mnemonicParsing="false" onAction="#openPrLast" text="Button" />
                </items>
             </ToolBar>
          </children>
@@ -67,7 +67,7 @@
                   <AnchorPane fx:id="treeViewPane" />
                   <AnchorPane>
                      <children>
-                        <TabPane fx:id="redactorTabs" prefHeight="431.0" prefWidth="556.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <TabPane fx:id="redactorTabs" prefHeight="431.0" prefWidth="556.0" tabClosingPolicy="ALL_TABS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children></AnchorPane>
                </items>
             </SplitPane>
