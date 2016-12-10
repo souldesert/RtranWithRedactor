@@ -8,6 +8,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import xml.Saver;
 
 import java.io.File;
 import java.io.IOException;
@@ -88,6 +89,15 @@ public class RootWindowController {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    private void handleSave() {
+        Saver saver = new Saver();
+        saver.save(mainApp.getR_pro());
+        mainApp.getPrimaryStage().setTitle(mainApp.getR_pro().getProgname());
+    }
+
+
 
     @FXML
     void openPrLast() throws IOException {

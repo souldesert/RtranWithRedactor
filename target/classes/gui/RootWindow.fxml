@@ -36,6 +36,7 @@
                          <MenuItem mnemonicParsing="false" onAction="#openProject" text="Открыть проект" />
                          <MenuItem mnemonicParsing="false" onAction="#closeProject" text="Закрыть Проект" />
                          <MenuItem mnemonicParsing="false" onAction="#closeProgram" text="Выйти" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleSave" text="Сохранить проект" />
 
                      </items>
                   </Menu>
